@@ -9,7 +9,7 @@ use MOIREI\Metre\Objects\MeasureType;
 use MOIREI\Metre\Objects\MetreInput;
 use MOIREI\Metre\Objects\Usage;
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidPeriodParametreException;
+use Carbon\Exceptions\InvalidPeriodParameterException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
@@ -114,7 +114,7 @@ class Metre implements Arrayable, JsonSerializable
         if ($ts) {
             $ts = $ts->unix();
             if (count($periods) && $ts <= max($periods)) {
-                throw new InvalidPeriodParametreException("New period must be greater than previous periods.");
+                throw new InvalidPeriodParameterException("New period must be greater than previous periods.");
             }
         } else {
             $ts = now()->unix();
@@ -171,6 +171,9 @@ class Metre implements Arrayable, JsonSerializable
         array $tags = [],
         array|float $period = null,
     ): bool {
+        if ($this->getDataAttribute("measures.$measure.type") === MeasureType::FEATURE) {
+            return !!$this->getDataAttribute("measures.$measure.limit");
+        }
         if (!is_numeric($this->getDataAttribute("measures.$measure.limit"))) {
             return true;
         }
@@ -196,13 +199,13 @@ class Metre implements Arrayable, JsonSerializable
      *
      * @param string $name
      * @param \MOIREI\Metre\Objects\MeasureType $type
-     * @param float $limit
+     * @param float|bool $limit
      * @param string[] $defaultTags
      */
     public function addMeasure(
         string $name,
         MeasureType $type = null,
-        float $limit = null,
+        float|bool $limit = null,
         array $defaultTags = [],
     ) {
         $this->setDataAttribute("measures.$name", [
@@ -245,11 +248,11 @@ class Metre implements Arrayable, JsonSerializable
      * Set measure usage limit.
      *
      * @param string $name
-     * @param float $limit
+     * @param float|bool $limit
      */
     public function setMeasureLimit(
         string $name,
-        float $limit,
+        float|bool $limit,
     ) {
         $this->setDataAttribute("measures.$name.limit", $limit);
     }

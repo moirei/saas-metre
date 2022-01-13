@@ -10,6 +10,7 @@ use Funeralzone\ValueObjects\ValueObject;
  *
  * @method static self METERED()
  * @method static self VOLUME()
+ * @method static self FEATURE()
  */
 final class MeasureType implements ValueObject
 {
@@ -28,4 +29,11 @@ final class MeasureType implements ValueObject
      * @var string
      */
     public const VOLUME = 'volume';
+
+    /**
+     * Type: FEATURE
+     *
+     * @var string
+     */
+    public const FEATURE = 'feature';
 }
