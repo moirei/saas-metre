@@ -11,6 +11,7 @@ use MOIREI\Metre\Metre;
 beforeEach(function () {
     $this->metre = new Metre();
     $this->metre->addMeasure('user_accounts');
+    $this->metre->addMeasure('locations');
 });
 
 it('expects measure "user_accounts" to exist', function () {
@@ -29,6 +30,13 @@ it('expects usage to be 3', function () {
     $this->metre->increment('user_accounts', count: 2);
     $usage = $this->metre->usage('user_accounts');
     expect($usage->count)->toEqual(3);
+});
+
+it('expect to use when limited to 1', function () {
+    $this->metre->setMeasureLimit('locations', 1);
+    expect($this->metre->canUse('locations'))->toEqual(true);
+    $this->metre->increment('locations');
+    expect($this->metre->canUse('locations'))->toEqual(false);
 });
 
 it('expects cleared measure to be 0', function () {
@@ -84,8 +92,8 @@ it('expects METERED overuse to throw exception', function () {
     $this->metre->newPeriod();
     $this->metre->increment('user_accounts', count: 2);
     expect($this->metre->usage('user_accounts')->count)->toEqual(2);
-    expect($this->metre->canUse('user_accounts', count: 3))->toBeFalse();
-    $this->metre->increment('user_accounts', count: 3); // <--- exception
+    expect($this->metre->canUse('user_accounts', count: 4))->toBeFalse();
+    $this->metre->increment('user_accounts', count: 4); // <--- exception
 })->throws(MeasureExhaustedException::class);
 
 it('expects VOLUME overuse to throw exception', function () {
@@ -95,8 +103,8 @@ it('expects VOLUME overuse to throw exception', function () {
     $this->metre->increment('user_accounts', count: 5);
     sleep(1);
     $this->metre->newPeriod(); // even in new period
-    expect($this->metre->canUse('user_accounts', count: 2))->toBeFalse();
-    $this->metre->increment('user_accounts', count: 2); // <--- exception
+    expect($this->metre->canUse('user_accounts', count: 6))->toBeFalse();
+    $this->metre->increment('user_accounts', count: 6); // <--- exception
 })->throws(MeasureExhaustedException::class);
 
 it('expects removed measure to not exists', function () {

@@ -191,7 +191,7 @@ class Metre implements Arrayable, JsonSerializable
             period: $period,
         );
 
-        return ($usage->count + $count) < $usage->limit;
+        return ($usage->count + $count) <= $usage->limit;
     }
 
     /**
